@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Profit Wise</string>
+    <string name="web_client_id">1003345595234-dp34e1h24dssej8sfsjdsprlh5g892qd.apps.googleusercontent.com</string>
+    <string name="top_gainers">Top Gainers</string>
+    <string name="all_stocks">All Stocks</string>
+    <string name="top_losers">Top Losers</string>
+    <string name="favorite">Favorite</string>
+    <string name="us_stock">Saham US</string>
+    <string name="idn_stock">Saham Indo</string>
+</resources>

@@ -1,0 +1,62 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#000000">
+
+    <!-- LinearLayout sebagai parent untuk konten -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!-- Top Gainers Button -->
+        <LinearLayout
+            android:id="@+id/category"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:orientation="horizontal"
+            android:background="@drawable/rounded_button"
+            android:gravity="center"
+            android:elevation="4dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:id="@+id/categoryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Current category: All Stocks"
+                android:fontFamily="sans-serif-medium"
+                android:text="All Stocks"
+                android:textColor="#81F7E5"
+                android:textSize="12dp" />
+
+            <ImageView
+                android:id="@+id/categoryIcon"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:src="@android:drawable/arrow_down_float"
+                android:layout_marginStart="8dp"
+                app:tint="#81F7E5" />
+        </LinearLayout>
+
+        <!-- ProgressBar untuk loading -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone" />
+
+        <!-- RecyclerView untuk daftar item -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:background="#000000" />
+    </LinearLayout>
+</ScrollView>

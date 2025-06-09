@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="abu2">#808080</color>
+    <color name="blue2">#32ADE6</color>
+    <color name="dgreen">#4E6247</color>
+    <color name="abu">#CCC9C9</color>
+    <color name="teal">#81F7E5</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="positive_green">#4CAF50</color>
+    <color name="negative_red">#F44336</color>
+</resources>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="#000000">
+
+    <!-- Logo -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/logo"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10mm"
+        android:src="@drawable/logo"
+        android:tint="@android:color/white" />
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#000000">
+
+        <!-- Username Field -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Username"
+            android:textColor="#ADA7A7"
+            android:textSize="12sp"
+            android:paddingBottom="2dp" />
+
+        <EditText
+            android:id="@+id/usernameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:background="@android:color/transparent"
+            android:inputType="text"
+            android:paddingBottom="2dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#FFFFFF" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Password"
+            android:textColor="#ADA7A7"
+            android:textSize="12sp"
+            android:layout_marginTop="12dp"
+            android:paddingBottom="2dp" />
+
+        <EditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:textColor="#FFFFFF"
+            android:background="@android:color/transparent"
+            android:paddingBottom="3dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#FFFFFF" />
+    </LinearLayout>
+    <!-- Login Button -->
+    <Button
+        android:id="@+id/confirmLoginButton"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/blue2"
+        android:text="Login"
+        android:textColor="#FFFFFFFF"
+        android:textSize="14sp" />
+
+    <!-- Sign In with Google Button -->
+    <LinearLayout
+        android:id="@+id/btn_google"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/confirmLoginButton"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/animasi_gradasi"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="10dp">
+        <!-- Google Logo -->
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/logo_google"
+            android:layout_marginEnd="20dp" />
+
+        <!-- Button Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign In with Google"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- Login Link -->
+    <TextView
+        android:id="@+id/regisLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don't Have an Account? Sign Up"
+        android:textColor="#00BFFF"
+        android:textSize="14sp"
+        android:layout_marginTop="14sp"
+        android:gravity="center" />
+
+</LinearLayout>
