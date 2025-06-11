@@ -15,5 +15,3 @@
 - Matplotlib, Seaborn
 - Scikit-learn
 - HTML/CSS (Jinja2 Template)
-
-## 🗂 Struktur Proyek
