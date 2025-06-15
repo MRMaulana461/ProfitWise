@@ -12,7 +12,6 @@
 ## 🧠 Teknologi yang Digunakan
 - Python + Flask
 - TensorFlow / Keras
-- OpenCV, Tesseract (OCR)
 - Matplotlib, Seaborn
 - Scikit-learn
-- HTML/CSS (Jinja2 Template)
+- Kotlin
