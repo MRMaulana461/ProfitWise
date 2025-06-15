@@ -58,7 +58,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username"
+                android:text="Email"
                 android:textColor="#AAAAAA"
                 android:textSize="14sp"
                 android:layout_marginBottom="4dp" />
@@ -72,6 +72,7 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:id="@+id/email"
                     android:text="User"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
@@ -83,49 +84,6 @@
                     android:src="@drawable/ic_edit"
                     android:tint="#AAAAAA" />
             </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#333333"
-                android:layout_marginTop="8dp" />
-
-            <!-- Akun Media Sosial -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Akun Media Sosial"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add now"
-                    android:textColor="#50E3C2"
-                    android:textSize="16sp"
-                    android:layout_weight="1" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_edit"
-                    android:tint="#AAAAAA" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#333333"
-                android:layout_marginTop="8dp" />
 
             <!-- Informasi Pribadi -->
             <TextView
@@ -154,93 +112,23 @@
                 android:gravity="center_vertical">
 
                 <EditText
+                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="User 1abc"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:layout_weight="1" />
+                    android:textSize="16sp" />
 
                 <ImageView
+                    android:id="@+id/checkIcon"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:src="@drawable/ic_edit"
+                    android:src="@drawable/ic_check"
                     android:tint="#AAAAAA" />
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#333333"
-                android:layout_marginTop="8dp" />
 
-            <!-- Nomor Telepon -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nomor Telepon"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add now"
-                    android:textColor="#50E3C2"
-                    android:textSize="16sp"
-                    android:layout_weight="1" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_edit"
-                    android:tint="#AAAAAA" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#333333"
-                android:layout_marginTop="8dp" />
-
-            <!-- Alamat Email -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Alamat Email"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="4dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Add now"
-                    android:textColor="#50E3C2"
-                    android:textSize="16sp"
-                    android:layout_weight="1" />
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_edit"
-                    android:tint="#AAAAAA" />
-            </LinearLayout>
 
             <Button
                 android:id="@+id/logoutButton"

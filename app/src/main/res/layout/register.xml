@@ -22,7 +22,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="First Name"
+        android:text="Nama Lengkap"
         android:textColor="#ADA7A7"
         android:textSize="12sp"
         android:paddingBottom="2dp" />
@@ -33,32 +33,7 @@
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
         android:background="@android:color/transparent"
-        android:hint="First Name"
-        android:inputType="text"
-        android:paddingBottom="2dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#FFFFFF" />
-
-    <!-- Last Name Field -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Last Name"
-        android:textColor="#ADA7A7"
-        android:textSize="12sp"
-        android:paddingBottom="2dp"
-        android:layout_marginTop="12dp" />
-
-    <EditText
-        android:id="@+id/lastNameInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="#FFFFFF"
-        android:background="@android:color/transparent"
-        android:hint="Last Name"
+        android:hint="Nama Lengkap"
         android:inputType="text"
         android:paddingBottom="2dp" />
 
@@ -142,7 +117,7 @@
         android:layout_height="1dp"
         android:background="#FFFFFF" />
 
-    <!-- Sign Up Button -->
+    <!-- Login Link -->
     <Button
         android:id="@+id/confirmSignupButton"
         android:layout_width="280dp"
@@ -153,7 +128,6 @@
         android:textColor="#FFFFFFFF"
         android:textSize="14sp" />
 
-    <!-- Login Link -->
     <TextView
         android:id="@+id/loginLink"
         android:layout_width="wrap_content"

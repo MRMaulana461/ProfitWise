@@ -6,6 +6,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.apigrafik.databinding.RegisterBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 
 class Register : AppCompatActivity() {
     private lateinit var binding: RegisterBinding
@@ -20,19 +22,18 @@ class Register : AppCompatActivity() {
 
         // Handle tombol "Signup"
         binding.confirmSignupButton.setOnClickListener {
-            val firstName = binding.firstNameInput.text.toString()
-            val lastName = binding.lastNameInput.text.toString()
+            val firstName = binding.firstNameInput.text.toString() // Ambil input first name
             val email = binding.emailInput.text.toString()
             val password = binding.passwordInput.text.toString()
             val confirmPassword = binding.confirmPasswordInput.text.toString()
 
             // Validasi input
-            if (firstName.isEmpty() || lastName.isEmpty()) {
-                Toast.makeText(this, "First Name dan Last Name tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            if (firstName.isEmpty()) {
+                Toast.makeText(this, "First Name tidak boleh kosong", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            if (email.isEmpty() || confirmPassword.isEmpty()) {
+            if (email.isEmpty()) {
                 Toast.makeText(this, "Email tidak boleh kosong", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -50,13 +51,25 @@ class Register : AppCompatActivity() {
             // Mendaftarkan user ke Firebase Authentication
             firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(this, "Registrasi berhasil!", Toast.LENGTH_SHORT).show()
-                    // Pindah ke halaman Login
-                    val intent = Intent(this, Login::class.java)
-                    startActivity(intent)
-                    finish()
+                    // Jika registrasi berhasil, update profil untuk menyimpan First Name ke displayName
+                    val user: FirebaseUser? = firebaseAuth.currentUser
+                    val profileUpdates = UserProfileChangeRequest.Builder()
+                        .setDisplayName(firstName) // Set First Name sebagai displayName
+                        .build()
+
+                    user?.updateProfile(profileUpdates)?.addOnCompleteListener { updateTask ->
+                        if (updateTask.isSuccessful) {
+                            Toast.makeText(this, "Registrasi berhasil!", Toast.LENGTH_SHORT).show()
+                            // Pindah ke halaman Login
+                            val intent = Intent(this, Login::class.java)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            Toast.makeText(this, "Gagal menyimpan profil: ${updateTask.exception?.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 } else {
-                    // Jika terjadi error
+                    // Jika registrasi gagal
                     Toast.makeText(this, "Registrasi gagal: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                 }
             }

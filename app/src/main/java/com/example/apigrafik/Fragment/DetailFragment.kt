@@ -1,5 +1,6 @@
 package com.example.apigrafik.Fragment
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.apigrafik.R
 import com.github.mikephil.charting.charts.LineChart
@@ -16,18 +18,27 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.text.NumberFormat
 import java.util.Locale
 
 class DetailFragment : Fragment() {
 
     private var isFavorite = false
+    private val db = Firebase.firestore
+    private lateinit var auth: FirebaseAuth
+    private var stockSymbolText: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.detail, container, false)
+
+        auth = FirebaseAuth.getInstance()
+        stockSymbolText = arguments?.getString("stockSymbol") ?: ""
 
         // Initialize views
         val stockName = view.findViewById<TextView>(R.id.tvLongName)
@@ -44,6 +55,15 @@ class DetailFragment : Fragment() {
         val favoriteButton = view.findViewById<FloatingActionButton>(R.id.favoriteIcon)
         val analystrating = view.findViewById<TextView>(R.id.tvAnalystRating)
 
+        // Only check favorites if we have a valid symbol
+        if (stockSymbolText.isNotEmpty()) {
+            checkIfFavorite(favoriteButton)
+        }
+
+        favoriteButton.setOnClickListener {
+            toggleFavorite(favoriteButton)
+        }
+
         arguments?.let { args ->
             // Format currency values
             val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
@@ -52,9 +72,14 @@ class DetailFragment : Fragment() {
             stockName.text = args.getString("stockName", "Unknown")
             stockSymbol.text = args.getString("stockSymbol", "Unknown")
 
-            // Format price with currency
+            // Determine the currency symbol
+            val stockSymbolText = args.getString("stockSymbol", "")
+            val isRupiah = stockSymbolText.endsWith(".JK")
+            val currencySymbol = if (isRupiah) "Rp. " else "$ "
+
+            // Format price with the correct currency symbol
             val priceValue = args.getFloat("stockPriceFloat", 0f)
-            stockPrice.text = currencyFormat.format(priceValue)
+            stockPrice.text = "$currencySymbol${currencyFormat.format(priceValue).replace(currencyFormat.currency.symbol, "").trim()}"
 
             // Format and set price change with color
             val changeValue = args.getString("stockChange", "0")
@@ -67,23 +92,29 @@ class DetailFragment : Fragment() {
                 })
             }
 
-            // Format ranges
-            stockDayRange.text = "High: ${currencyFormat.format(args.getFloat("stockDayHigh", 0f))}\nLow: ${currencyFormat.format(args.getFloat("stockDayLow", 0f))}"
+            // Format and set daily range
+            val highValue = args.getFloat("stockDayHigh", 0f)
+            val lowValue = args.getFloat("stockDayLow", 0f)
+            stockDayRange.text = "High: $currencySymbol${currencyFormat.format(highValue).replace(currencyFormat.currency.symbol, "").trim()}\n" +
+                    "Low: $currencySymbol${currencyFormat.format(lowValue).replace(currencyFormat.currency.symbol, "").trim()}"
 
             // Format market cap with suffix (B/T)
             val marketCap = args.getString("stockMarketCap", "Unknown")
-            stockMarketCap.text = marketCap
+            stockMarketCap.text = if (marketCap != "Unknown") {
+                "$currencySymbol$marketCap"
+            } else {
+                "Unknown"
+            }
 
             // Format volume with suffix (M/B)
             stockVolume.text = args.getString("stockVolume", "Unknown")
 
             // Format dividend yield
             stockDividendYield.text = "${args.getString("stockDividendYield", "0")}%"
-
             fullExchangeName.text = args.getString("fullExchangeName", "Unknown")
-
             analystrating.text = args.getString("averageAnalystRating", "Unknown")
 
+            // Set dividend date
             val dividendDate = arguments?.getString("dividendDate", "N/A")
             val tvDividendDate = view.findViewById<TextView>(R.id.tvdividenDate)
             tvDividendDate.text = dividendDate
@@ -94,7 +125,7 @@ class DetailFragment : Fragment() {
                 args.getFloat("stockLow", 0f),
                 args.getFloat("stockHigh", 0f),
                 args.getFloat("stockPriceFloat", 0f),
-                args.getString("stockChange", "0")  // Kirimkan stockChange ke fungsi
+                args.getString("stockChange", "0")
             )
         }
 
@@ -102,17 +133,86 @@ class DetailFragment : Fragment() {
         backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
-
-        favoriteButton.setOnClickListener {
-            isFavorite = !isFavorite
-            updateFavoriteButton(favoriteButton)
-        }
-
         return view
     }
 
+    private fun checkIfFavorite(favoriteButton: FloatingActionButton) {
+        val currentUser = auth.currentUser
+        if (currentUser != null && stockSymbolText.isNotEmpty()) {
+            db.collection("users")
+                .document(currentUser.uid)
+                .collection("favorites")
+                .document(stockSymbolText)
+                .get()
+                .addOnSuccessListener { document ->
+                    isFavorite = document.exists()
+                    updateFavoriteButton(favoriteButton)
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        context,
+                        "Error checking favorite status: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
+    }
+
+    private fun toggleFavorite(favoriteButton: FloatingActionButton) {
+        val currentUser = auth.currentUser
+        if (currentUser == null) {
+            Toast.makeText(context, "Please login to add favorites", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (stockSymbolText.isEmpty()) {
+            Toast.makeText(context, "Invalid stock symbol", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val favoriteRef = db.collection("users")
+            .document(currentUser.uid)
+            .collection("favorites")
+            .document(stockSymbolText)
+
+        if (isFavorite) {
+            favoriteRef.delete()
+                .addOnSuccessListener {
+                    isFavorite = false
+                    updateFavoriteButton(favoriteButton)
+                    Toast.makeText(context, "Removed from favorites", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Error removing favorite: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            val favoriteData = hashMapOf(
+                "symbol" to stockSymbolText,
+                "timestamp" to System.currentTimeMillis()
+            )
+
+            favoriteRef.set(favoriteData)
+                .addOnSuccessListener {
+                    isFavorite = true
+                    updateFavoriteButton(favoriteButton)
+                    Toast.makeText(context, "Added to favorites", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(context, "Error adding favorite: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+    private fun updateFavoriteButton(favoriteButton: FloatingActionButton) {
+        favoriteButton.setImageResource(if (isFavorite) R.drawable.fav_aktif else R.drawable.fav_pasif)
+        favoriteButton.backgroundTintList = if (isFavorite) {
+            ColorStateList.valueOf(Color.RED)
+        } else {
+            ColorStateList.valueOf(Color.GRAY)
+        }
+    }
+
     private fun setupEnhancedChart(chart: LineChart, fiftyTwoWeekLow: Float, regularMarketPrice: Float, fiftyTwoWeekHigh: Float, stockChange: String) {
-        // Chart style configuration
         chart.apply {
             description.isEnabled = false
             setDrawGridBackground(false)
@@ -125,7 +225,6 @@ class DetailFragment : Fragment() {
             setViewPortOffsets(60f, 20f, 60f, 40f)
         }
 
-        // X-Axis configuration
         chart.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
             setDrawGridLines(false)
@@ -135,7 +234,6 @@ class DetailFragment : Fragment() {
             setLabelCount(3, true)
         }
 
-        // Y-Axis configuration
         chart.axisLeft.apply {
             setDrawGridLines(true)
             gridColor = Color.parseColor("#20FFFFFF")
@@ -145,25 +243,22 @@ class DetailFragment : Fragment() {
         }
         chart.axisRight.isEnabled = false
 
-        // Determine the color based on stock change
         val chartColor = if (stockChange.startsWith("+")) {
-            Color.parseColor("#4CAF50") // Green for positive change
+            Color.parseColor("#4CAF50")
         } else {
-            Color.parseColor("#F44336") // Red for negative change
+            Color.parseColor("#F44336")
         }
 
-        // Create data points for 52-week performance
         val entries = listOf(
-            Entry(0f, fiftyTwoWeekLow),  // Titik pertama: 52-week low
-            Entry(1f, regularMarketPrice),  // Titik kedua: harga pasar sekarang
-            Entry(2f, fiftyTwoWeekHigh)   // Titik ketiga: 52-week high
+            Entry(0f, fiftyTwoWeekLow),
+            Entry(1f, regularMarketPrice),
+            Entry(2f, fiftyTwoWeekHigh)
         )
 
-        // Create and style the dataset
         val dataSet = LineDataSet(entries, "52-Week Price Performance").apply {
             mode = LineDataSet.Mode.CUBIC_BEZIER
             cubicIntensity = 0.2f
-            color = chartColor  // Menggunakan warna berdasarkan perubahan harga
+            color = chartColor
             lineWidth = 2.5f
             setDrawCircles(true)
             setCircleColor(chartColor)
@@ -172,24 +267,14 @@ class DetailFragment : Fragment() {
             circleHoleRadius = 2f
             setDrawFilled(true)
             fillAlpha = 50
-            fillColor = chartColor  // Mengisi warna grafik dengan warna perubahan harga
+            fillColor = chartColor
             highLightColor = Color.WHITE
             setDrawHorizontalHighlightIndicator(false)
         }
 
-        // Set data to chart
         chart.data = LineData(dataSet)
         chart.animateX(1000)
         chart.invalidate()
-    }
-
-    private fun updateFavoriteButton(favoriteButton: FloatingActionButton) {
-        val iconResource = if (isFavorite) {
-            R.drawable.fav_aktif
-        } else {
-            R.drawable.fav_pasif
-        }
-        favoriteButton.setImageResource(iconResource)
     }
 
     companion object {

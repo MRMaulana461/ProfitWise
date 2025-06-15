@@ -1,18 +1,22 @@
 package com.example.apigrafik
 
+import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.apigrafik.Fragment.Stock
 import com.example.apigrafik.Fragment.Meta
 import com.example.apigrafik.Fragment.Body
 import com.example.apigrafik.network.RetrofitInstance
 import com.google.gson.JsonObject
+import com.google.gson.Gson
+import com.google.common.reflect.TypeToken
 import kotlinx.coroutines.launch
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 
-class StockViewModel : ViewModel() {
+class StockViewModel(application: Application) : AndroidViewModel(application) {
     private val _stocks = MutableLiveData<List<Stock>>()
     val stocks: LiveData<List<Stock>> = _stocks
 
@@ -25,7 +29,23 @@ class StockViewModel : ViewModel() {
     private var hasLoadedData = false
     private val stockCache = mutableMapOf<String, Stock>()
 
+    private val sharedPref = application.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+
+    private val CACHE_TIMEOUT = 5 * 60 * 60 * 1000 // 5 hours in milliseconds
+
     fun loadStockData() {
+        // Check if the cached data is still valid
+        val lastFetchTime = sharedPref.getLong("last_fetch_time", 0)
+        val currentTime = System.currentTimeMillis()
+
+        if (currentTime - lastFetchTime < CACHE_TIMEOUT) {
+            // Use cached data if not expired (less than 5 hours)
+            val cachedStocks = getCachedStockData()
+            _stocks.value = cachedStocks ?: emptyList()
+            hasLoadedData = cachedStocks != null
+            return
+        }
+
         if (hasLoadedData && !_stocks.value.isNullOrEmpty()) {
             return
         }
@@ -35,17 +55,19 @@ class StockViewModel : ViewModel() {
             try {
                 val stockGroups = listOf(
                     listOf("AAPL", "GOOGL", "MSFT", "AMZN", "NVDA", "TSLA", "META", "BRK-A", "JNJ", "V"),
-                    listOf("BBCA.JK", "BMRI.JK", "BBRI.JK", "ASII.JK", "TLKM.JK", "UNVR.JK", "HMSP.JK", "ICBP.JK", "ADRO.JK", "CPIN.JK"),
+                    listOf("BBCA.JK", "BBNI.JK", "BBRI.JK", "GOTO.JK", "TLKM.JK", "UNVR.JK", "SIDO.JK", "EMTK.JK", "ADRO.JK", "ANTM.JK"),
                     listOf("BABA", "NFLX", "DIS", "PYPL", "INTC", "CSCO", "AMD", "WMT", "KO", "PFE")
                 )
 
-                // Menggabungkan semua stok yang berhasil dimuat
+                // Combine all successfully loaded stocks
                 val allStocks = mutableListOf<Stock>()
                 for (group in stockGroups) {
                     loadStockBatch(group)?.let { allStocks.addAll(it) }
                 }
 
                 _stocks.value = allStocks
+                saveStockDataToCache(allStocks) // Save data to cache after loading
+                saveLastFetchTime(currentTime) // Save the last fetch time
                 hasLoadedData = true
             } catch (e: Exception) {
                 _error.value = e.localizedMessage ?: "An error occurred"
@@ -115,5 +137,30 @@ class StockViewModel : ViewModel() {
             Log.e("ParseStockList", "Error parsing stock list", e)
             emptyList()
         }
+    }
+
+    private fun getCachedStockData(): List<Stock>? {
+        val cachedData = sharedPref.getString("stock_data", null)
+        return if (cachedData != null) {
+            val gson = Gson()
+            val type = object : TypeToken<List<Stock>>() {}.type
+            gson.fromJson(cachedData, type)
+        } else {
+            null
+        }
+    }
+
+    private fun saveStockDataToCache(stocks: List<Stock>) {
+        val editor = sharedPref.edit()
+        val gson = Gson()
+        val json = gson.toJson(stocks)
+        editor.putString("stock_data", json)
+        editor.apply()
+    }
+
+    private fun saveLastFetchTime(time: Long) {
+        val editor = sharedPref.edit()
+        editor.putLong("last_fetch_time", time)
+        editor.apply()
     }
 }

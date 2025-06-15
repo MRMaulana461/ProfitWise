@@ -7,31 +7,32 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
-import com.example.apigrafik.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.apigrafik.NewsItem
 import com.example.apigrafik.NewsWebViewActivity
+import com.example.apigrafik.R
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.concurrent.thread
 
 class BeritaFragment : Fragment() {
-    private lateinit var newsListLayout: LinearLayout
+
+    private lateinit var newsRecyclerView: RecyclerView
+    private lateinit var newsAdapter: NewsAdapter
+    private var newsItems = mutableListOf<NewsItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_berita, container, false)
-        newsListLayout = view.findViewById(R.id.newsListLayout)
+
+        newsRecyclerView = view.findViewById(R.id.newsRecyclerView)
+        newsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         if (isNetworkAvailable()) {
             fetchAndDisplayNewsData()
@@ -73,7 +74,7 @@ class BeritaFragment : Fragment() {
                     if (newsResponse.isEmpty()) {
                         Toast.makeText(requireContext(), "No news available", Toast.LENGTH_LONG).show()
                     } else {
-                        displayNews(newsResponse)
+                        updateNewsAdapter(newsResponse)
                     }
                 }
             } catch (e: Exception) {
@@ -111,31 +112,10 @@ class BeritaFragment : Fragment() {
         return newsItems
     }
 
-    private fun displayNews(newsItems: List<NewsItem>) {
-        newsListLayout.removeAllViews()
-
-        for (newsItem in newsItems) {
-            val newsView = layoutInflater.inflate(R.layout.item_list_berita, newsListLayout, false)
-
-            val imageThumbnail = newsView.findViewById<ImageView>(R.id.imageThumbnail)
-            val newsTitle = newsView.findViewById<TextView>(R.id.newsTitle)
-            val newsDescription = newsView.findViewById<TextView>(R.id.newsDescription)
-            val publishedAt = newsView.findViewById<TextView>(R.id.publishedAt)
-
-            newsTitle.text = newsItem.title
-            newsDescription.text = newsItem.description
-            publishedAt.text = newsItem.publishedAt.replace("T", " ").replace("Z", "")
-
-            Glide.with(requireContext())
-                .load(newsItem.imageUrl?.ifEmpty { null } ?: R.drawable.ic_placeholder)
-                .placeholder(R.drawable.ic_placeholder)
-                .into(imageThumbnail)
-
-            newsView.setOnClickListener {
-                NewsWebViewActivity.start(requireContext(), newsItem.url)
-            }
-
-            newsListLayout.addView(newsView)
-        }
+    private fun updateNewsAdapter(newsList: List<NewsItem>) {
+        newsItems.clear()
+        newsItems.addAll(newsList)
+        newsAdapter = NewsAdapter(requireContext(), newsItems)
+        newsRecyclerView.adapter = newsAdapter
     }
 }

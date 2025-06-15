@@ -15,21 +15,30 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.apigrafik.R
 import com.example.apigrafik.StockAdapter
 import com.example.apigrafik.StockViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class ListSahamFragment : Fragment() {
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: StockAdapter
     private lateinit var viewModel: StockViewModel
+    private var currentCategory = "All Stocks" // Tambahkan variable untuk menyimpan kategori
+
+    private val favoriteSymbols = mutableListOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_list_saham, container, false)
+
+        // Restore kategori yang tersimpan jika ada
+        savedInstanceState?.getString("currentCategory")?.let {
+            currentCategory = it
+        }
 
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -46,7 +55,51 @@ class ListSahamFragment : Fragment() {
             showCategoryBottomSheet()
         }
 
+        // Ambil data favorit dari Firestore
+        fetchFavoritesFromFirestore()
+
         return view
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("currentCategory", currentCategory)
+    }
+
+    private fun fetchFavoritesFromFirestore() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(requireContext(), "User not logged in", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val firestore = FirebaseFirestore.getInstance()
+        val docRef = firestore.collection("users").document(userId).collection("favorites")
+
+        docRef.get()
+            .addOnSuccessListener { querySnapshot ->
+                favoriteSymbols.clear()
+                querySnapshot.documents.forEach { document ->
+                    val symbol = document.id
+                    favoriteSymbols.add(symbol)
+                }
+                // Tampilkan kategori yang sedang aktif setelah mendapatkan data favorit
+                displayFilteredStocks(currentCategory)
+                updateCategoryView(currentCategory)
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), "Failed to fetch favorites: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun showCategoryBottomSheet() {
+        val bottomSheet = CategoryBottomSheetFragment()
+        bottomSheet.setOnCategorySelectedListener { category ->
+            currentCategory = category // Update kategori saat ini
+            updateCategoryView(category)
+            displayFilteredStocks(category)
+        }
+        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
     }
 
     private fun setupObservers() {
@@ -148,15 +201,6 @@ class ListSahamFragment : Fragment() {
         }
     }
 
-    private fun showCategoryBottomSheet() {
-        val bottomSheet = CategoryBottomSheetFragment()
-        bottomSheet.setOnCategorySelectedListener { category ->
-            updateCategoryView(category)
-            displayFilteredStocks(category)
-        }
-        bottomSheet.show(parentFragmentManager, bottomSheet.tag)
-    }
-
     private fun updateCategoryView(category: String) {
         val categoryText = requireView().findViewById<TextView>(R.id.categoryText)
         val categoryMap = mapOf(
@@ -199,7 +243,6 @@ class ListSahamFragment : Fragment() {
     }
 
     private fun filterByFavorites(): List<Stock> {
-        val favoriteSymbols = listOf("AAPL", "GOOGL", "TSLA")
         return viewModel.stocks.value.orEmpty().filter {
             favoriteSymbols.contains(it.body.firstOrNull()?.symbol)
         }

@@ -128,7 +128,17 @@ class SearchFragment : Fragment() {
                 "AMD" to R.drawable.logo_amd,
                 "WMT" to R.drawable.logo_walmart,
                 "KO" to R.drawable.logo_cocacola,
-                "PFE" to R.drawable.logo_pfizer,
+                "PFE" to R.drawable.logo_pfe,
+                "BBCA.JK" to R.drawable.logo_bbca,
+                "BBNI.JK" to R.drawable.logo_bbni,
+                "BBRI.JK" to R.drawable.logo_bbri,
+                "GOTO.JK" to R.drawable.logo_goto,
+                "TLKM.JK" to R.drawable.logo_tlkm,
+                "UNVR.JK" to R.drawable.logo_unvr,
+                "SIDO.JK" to R.drawable.logo_sido,
+                "EMTK.JK" to R.drawable.logo_emtk,
+                "ADRO.JK" to R.drawable.logo_adro,
+                "ANTM.JK" to R.drawable.logo_antm
             )
             logoView.setImageResource(logoMap[stockBody.symbol] ?: R.drawable.ic_placeholder)
 
@@ -192,9 +202,11 @@ class SearchFragment : Fragment() {
     // Fungsi untuk format Market Cap
     fun formatMarketCap(marketCap: Long): String {
         return when {
-            marketCap >= 1_000_000_000 -> String.format("%.2fB", marketCap / 1_000_000_000.0)
-            marketCap >= 1_000_000 -> String.format("%.2fM", marketCap / 1_000_000.0)
-            else -> String.format("%d", marketCap)
+            marketCap >= 1_000_000_000_000 -> String.format("%.1fT", marketCap / 1_000_000_000_000.0) // Trillions
+            marketCap >= 1_000_000_000 -> String.format("%.1fB", marketCap / 1_000_000_000.0) // Billions
+            marketCap >= 1_000_000 -> String.format("%.1fM", marketCap / 1_000_000.0) // Millions
+            marketCap >= 1_000 -> String.format("%.1fK", marketCap / 1_000.0) // Thousands
+            else -> marketCap.toString()
         }
     }
 

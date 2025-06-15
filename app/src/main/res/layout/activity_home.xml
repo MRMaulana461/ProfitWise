@@ -51,13 +51,12 @@
                 <!-- Ikon Profil -->
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/icon_profil"
-                    android:layout_width="30dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:src="@drawable/ic_placeholder"
+                    android:src="@drawable/ic_profile"
                     android:tint="@android:color/white" />
-
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>

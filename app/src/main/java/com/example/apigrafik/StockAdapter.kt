@@ -18,6 +18,9 @@ class StockAdapter(
     private val onItemClicked: (Stock) -> Unit
 ) : RecyclerView.Adapter<StockAdapter.StockViewHolder>() {
 
+    private var selectedStock: Stock? = null
+
+    fun getCurrentSelectedStock(): Stock? = selectedStock
     fun updateStocks(newStocks: List<Stock>) {
         stocks = newStocks
         notifyDataSetChanged()
@@ -81,7 +84,17 @@ class StockAdapter(
                 "AMD" to R.drawable.logo_amd,
                 "WMT" to R.drawable.logo_walmart,
                 "KO" to R.drawable.logo_cocacola,
-                "PFE" to R.drawable.logo_pfizer,
+                "PFE" to R.drawable.logo_pfe,
+                "BBCA.JK" to R.drawable.logo_bbca,
+                "BBNI.JK" to R.drawable.logo_bbni,
+                "BBRI.JK" to R.drawable.logo_bbri,
+                "GOTO.JK" to R.drawable.logo_goto,
+                "TLKM.JK" to R.drawable.logo_tlkm,
+                "UNVR.JK" to R.drawable.logo_unvr,
+                "SIDO.JK" to R.drawable.logo_sido,
+                "EMTK.JK" to R.drawable.logo_emtk,
+                "ADRO.JK" to R.drawable.logo_adro,
+                "ANTM.JK" to R.drawable.logo_antm
             )
             logoView.setImageResource(logoMap[stockBody.symbol] ?: R.drawable.ic_placeholder)
 
