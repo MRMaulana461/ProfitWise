@@ -1,6 +1,6 @@
 # 📊 ProfitWise
 
-**ProfitWise** adalah aplikasi berbasis Flask untuk memprediksi performa video YouTube dan memberikan rekomendasi desain thumbnail berdasarkan analisis visual seperti warna, teks, dan objek.
+**ProfitWise** adalah aplikasi yang dibuat untuk memberikan edukasi finanasial untuk calon investor dalam memahami saham yang ingin mereka investasikan.
 
 ## 🚀 Fitur Utama
 - Menampilkan harga saham realtime 
